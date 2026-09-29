@@ -1,8 +1,8 @@
 """Read-only client for the Yahoo Fantasy Sports API.
 
-Phase 0 scope: authenticate (see auth.py), discover your leagues, and
-fetch raw league JSON. Roster and matchup parsing land in Phase 1,
-once we've seen the real response shapes.
+Authenticates (see auth.py), discovers your leagues, and fetches raw
+league JSON. Roster, ownership, settings, and matchup parsing are not
+implemented yet.
 """
 from __future__ import annotations
 

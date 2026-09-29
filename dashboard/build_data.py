@@ -16,7 +16,7 @@ from waiverwire.data.weekly import build_weekly
 from waiverwire.metrics.breakouts import score_breakouts
 
 OUT = Path(__file__).parent / "data.json"
-TOP_N = 30
+TOP_N = 150
 
 
 def main() -> None:

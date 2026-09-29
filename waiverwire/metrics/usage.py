@@ -47,7 +47,7 @@ def add_trends(df: pd.DataFrame, column: str = "touches", window: int = 2) -> pd
     """Add a simple trend signal: recent average vs prior average.
 
     Positive means usage is rising. This is the breakout primitive
-    the waiver report builds on in Phase 1.
+    the waiver report builds on.
     """
     out = df.sort_values(["player_id", "week"]).copy()
     recent = out.groupby("player_id")[column].transform(

@@ -1,4 +1,8 @@
 [
+  "tests/test_breakouts.py::test_breakout_excludes_qb_and_low_snaps",
+  "tests/test_breakouts.py::test_breakout_flags_points_lagging",
+  "tests/test_breakouts.py::test_breakout_ranks_rising_usage_first",
+  "tests/test_breakouts.py::test_breakout_uses_no_lookahead",
   "tests/test_usage.py::test_flat_usage_has_zero_trend",
   "tests/test_usage.py::test_rising_usage_has_positive_trend",
   "tests/test_usage.py::test_target_share_sums_to_one"

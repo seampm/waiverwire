@@ -728,7 +728,7 @@
         return;
       }
       out.innerHTML = '<div class="mu-teams">' + renderSide('Your team', a) + renderSide('Opponent', b) + '</div>' + renderEdges(a, b);
-      toast('Matchup compared');
+      showToast('Matchup compared');
     }
 
     document.getElementById('compareBtn').addEventListener('click', compareTeams);

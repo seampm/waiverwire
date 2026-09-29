@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in — WaiverWire</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0e13; color: #e8ecf1; font: 16px/1.5 system-ui, -apple-system, sans-serif; }
+  .card { width: min(400px, 92vw); border: 1px solid #232a35; border-radius: 16px; padding: 32px; background: #10151c; }
+  h1 { margin: 0 0 4px; font-size: 24px; }
+  p.sub { margin: 0 0 24px; color: #8b95a5; font-size: 14px; }
+  label { display: block; font-size: 13px; color: #8b95a5; margin: 14px 0 6px; }
+  input { width: 100%; box-sizing: border-box; background: #0b0e13; border: 1px solid #2b3442; color: #e8ecf1; border-radius: 10px; padding: 11px 14px; font: inherit; }
+  input:focus { outline: none; border-color: #4cc38a; }
+  button { width: 100%; margin-top: 22px; background: #4cc38a; border: 0; color: #06130c; font: inherit; font-weight: 700; border-radius: 10px; padding: 12px; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  .err { display: none; margin-top: 14px; color: #ff8a8a; font-size: 14px; }
+  .alt { margin-top: 18px; font-size: 14px; color: #8b95a5; text-align: center; }
+  .alt a { color: #e8ecf1; }
+  .back { display: block; text-align: center; margin-top: 12px; font-size: 13px; color: #8b95a5; text-decoration: none; }
+</style>
+</head>
+<body>
+  <form class="card" id="loginForm">
+    <h1>Log in</h1>
+    <p class="sub">Your saved matchups and watchlist are waiting.</p>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" required>
+    <p class="err" id="err"></p>
+    <button type="submit" id="submit">Log in</button>
+    <p class="alt">No account? <a href="/signup">Sign up</a></p>
+    <a class="back" href="/">Back to the board</a>
+  </form>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const err = document.getElementById('err');
+      const btn = document.getElementById('submit');
+      err.style.display = 'none';
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+          })
+        });
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({}));
+          throw new Error(j.detail || 'Log in failed');
+        }
+        location.href = '/';
+      } catch (ex) {
+        err.textContent = ex.message;
+        err.style.display = 'block';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

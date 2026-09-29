@@ -1,0 +1,14 @@
+[
+  "tests/test_api.py::test_admin_refresh",
+  "tests/test_api.py::test_board",
+  "tests/test_api.py::test_duplicate_email_rejected",
+  "tests/test_api.py::test_health",
+  "tests/test_api.py::test_login_logout_flow",
+  "tests/test_api.py::test_matchup_crud",
+  "tests/test_api.py::test_matchup_isolation_between_users",
+  "tests/test_api.py::test_matchups_require_auth",
+  "tests/test_api.py::test_pool",
+  "tests/test_api.py::test_search",
+  "tests/test_api.py::test_signup_validation",
+  "tests/test_api.py::test_watchlist_flow"
+]

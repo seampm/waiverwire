@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>WaiverWire Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #e9eee8;
+      --panel: #f8faf5;
+      --panel-2: #f0f4ed;
+      --ink: #112018;
+      --muted: #56665d;
+      --faint: #829087;
+      --line: #cbd4cc;
+      --line-strong: #aebbb1;
+      --accent: #76a900;
+      --accent-bright: #b7f232;
+      --accent-ink: #172400;
+      --orange: #d45124;
+      --orange-bg: #ffe2d6;
+      --blue: #1d5f78;
+      --shadow: 0 18px 45px rgba(24, 42, 31, .09);
+      --focus: #286b8a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1410;
+        --panel: #142019;
+        --panel-2: #1b2921;
+        --ink: #eef6ef;
+        --muted: #a8b7ad;
+        --faint: #7f9186;
+        --line: #314139;
+        --line-strong: #48594f;
+        --accent: #a6dd27;
+        --accent-bright: #b7f232;
+        --accent-ink: #172400;
+        --orange: #ff8c61;
+        --orange-bg: #482a20;
+        --blue: #68b4d0;
+        --shadow: 0 18px 48px rgba(0, 0, 0, .28);
+        --focus: #7dc4df;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px),
+        var(--bg);
+      background-size: 56px 56px;
+      background-position: -1px -1px;
+      color: var(--ink);
+      font-family: "IBM Plex Sans", sans-serif;
+      line-height: 1.45;
+      min-width: 0;
+    }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .shell { width: min(1440px, 100%); margin: 0 auto; min-height: 100vh; background: var(--bg); box-shadow: 0 0 0 1px var(--line), var(--shadow); }
+    .top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      padding: clamp(26px, 5vw, 64px) clamp(20px, 5vw, 72px) 28px;
+      border-bottom: 1px solid var(--line-strong);
+      background: var(--panel);
+    }
+    .season { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: .84rem; font-weight: 600; }
+    .season span { display: inline-flex; align-items: center; gap: 8px; }
+    .season .live-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+    h1, h2, h3, .score, .rank, .metric strong, .stat strong { font-family: "Barlow Condensed", sans-serif; }
+    h1 { font-size: clamp(3rem, 7vw, 6.8rem); line-height: .84; letter-spacing: -.045em; margin: 16px 0 0; text-transform: uppercase; max-width: 850px; }
+    h1 em { color: var(--accent); font-style: normal; }
+    .top-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      border: 1px solid var(--line-strong);
+      color: var(--ink);
+      background: var(--panel);
+      min-height: 44px;
+      padding: 10px 15px;
+      cursor: pointer;
+      display: inline-flex;
+      gap: 9px;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background .18s ease, color .18s ease, border-color .18s ease;
+    }
+    .btn svg { width: 17px; height: 17px; }
+    .btn:hover { border-color: var(--ink); }
+    .btn.primary { background: var(--accent-bright); color: var(--accent-ink); border-color: var(--accent-ink); box-shadow: 4px 4px 0 var(--accent-ink); }
+    .btn.primary:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--accent-ink); }
+    .summary-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(330px, .55fr); border-bottom: 1px solid var(--line-strong); }
+    .featured { padding: clamp(24px, 4vw, 52px) clamp(20px, 5vw, 72px); border-right: 1px solid var(--line-strong); min-width: 0; }
+    .section-label { margin: 0 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: .78rem; color: var(--muted); font-weight: 600; }
+    .section-label b { color: var(--ink); font-size: .84rem; }
+    .feature-main { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: start; }
+    .player-line { display: flex; gap: 14px; align-items: center; }
+    .team-mark { width: 48px; height: 48px; flex: 0 0 auto; display: grid; place-items: center; background: var(--ink); color: var(--panel); font-family: "Barlow Condensed", sans-serif; font-weight: 800; letter-spacing: .04em; font-size: 1.05rem; }
+    .feature-name { font-family: "Barlow Condensed", sans-serif; font-size: clamp(2.4rem, 5vw, 5rem); line-height: .9; font-weight: 800; letter-spacing: -.035em; text-transform: uppercase; }
+    .identity { color: var(--muted); font-size: .86rem; font-weight: 600; margin-top: 6px; }
+    .signal-score { text-align: right; }
+    .score { font-size: clamp(3rem, 6vw, 6rem); font-weight: 800; line-height: .8; letter-spacing: -.03em; }
+    .score-denom { font-size: .8rem; color: var(--muted); font-weight: 600; margin-top: 10px; }
+    .thesis { font-size: clamp(1.08rem, 2vw, 1.36rem); line-height: 1.45; max-width: 700px; margin: 30px 0; color: var(--muted); }
+    .thesis strong { color: var(--ink); }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .metric { padding: 18px 18px 16px 0; }
+    .metric + .metric { padding-left: 18px; border-left: 1px solid var(--line); }
+    .metric span { display: block; color: var(--muted); font-size: .72rem; font-weight: 600; margin-bottom: 4px; }
+    .metric strong { display: block; font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1; }
+    .metric small { color: var(--accent); font-weight: 700; }
+    .watch { padding: clamp(24px, 4vw, 52px) clamp(20px, 4vw, 48px); background: var(--panel-2); }
+    .watch h2 { font-size: 2rem; text-transform: uppercase; line-height: 1; margin: 0; }
+    .queue { list-style: none; padding: 0; margin: 22px 0 0; }
+    .queue li { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px; align-items: center; padding: 16px 0; border-top: 1px solid var(--line); }
+    .queue li:last-child { border-bottom: 1px solid var(--line); }
+    .rank { color: var(--faint); font-size: 1.2rem; font-weight: 700; }
+    .queue-name { font-weight: 700; }
+    .queue-meta { display: block; color: var(--muted); font-size: .76rem; margin-top: 2px; }
+    .queue-score { font-family: "Barlow Condensed", sans-serif; font-size: 1.8rem; font-weight: 700; }
+    .board { padding: clamp(28px, 5vw, 68px) clamp(20px, 5vw, 72px); background: var(--panel); }
+    .board-head { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 24px; }
+    .board-head h2, .validation h2 { margin: 0; font-size: clamp(2.2rem, 4vw, 4rem); letter-spacing: -.025em; text-transform: uppercase; line-height: .95; }
+    .board-head p, .validation-intro { color: var(--muted); max-width: 620px; margin: 10px 0 0; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .filter {
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 13px;
+      min-height: 38px;
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 700;
+      border-radius: 999px;
+    }
+    .filter.active { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--muted); }
+    .search-wrap input { width: 100%; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); min-height: 46px; padding: 10px 15px 10px 43px; border-radius: 0; }
+    .board-list { border-top: 2px solid var(--ink); }
+    .player-row {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 58px minmax(160px, 1.05fr) minmax(220px, 1.45fr) minmax(180px, .8fr) 64px 22px;
+      gap: 16px;
+      align-items: center;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      padding: 17px 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+    }
+    .player-row:hover { background: var(--panel-2); }
+    .player-row.priority-row { box-shadow: inset 4px 0 0 var(--accent); padding-left: 15px; }
+    .row-rank { font-family: "Barlow Condensed", sans-serif; font-size: 1.25rem; color: var(--faint); text-align: center; }
+    .row-person { display: flex; gap: 11px; align-items: center; min-width: 0; }
+    .row-person .team-mark { width: 38px; height: 38px; font-size: .86rem; }
+    .row-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-meta, .reason { color: var(--muted); font-size: .78rem; }
+    .reason { line-height: 1.4; }
+    .trend { min-width: 0; }
+    .trend-label { display: flex; justify-content: space-between; gap: 8px; font-size: .72rem; color: var(--muted); margin-bottom: 7px; }
+    .trend-track { height: 7px; background: var(--line); overflow: hidden; }
+    .trend-fill { height: 100%; background: var(--accent); }
+    .tag { display: inline-flex; width: fit-content; padding: 4px 8px; font-size: .68rem; font-weight: 700; border: 1px solid var(--line-strong); color: var(--muted); }
+    .tag.priority { background: var(--accent-bright); color: var(--accent-ink); border-color: var(--accent-ink); }
+    .row-score { font-family: "Barlow Condensed", sans-serif; font-size: 1.7rem; font-weight: 700; text-align: right; }
+    .chev { color: var(--faint); }
+    .empty { padding: 48px 10px; color: var(--muted); text-align: center; border-bottom: 1px solid var(--line); }
+    .validation { padding: clamp(34px, 6vw, 78px) clamp(20px, 5vw, 72px); background: var(--ink); color: var(--panel); }
+    .validation .validation-intro { color: color-mix(in srgb, var(--panel) 68%, transparent); }
+    .proof-grid { display: grid; grid-template-columns: 1.35fr .65fr; gap: clamp(28px, 6vw, 86px); margin-top: 38px; align-items: end; }
+    .proof-chart { border-bottom: 1px solid color-mix(in srgb, var(--panel) 40%, transparent); padding-bottom: 13px; }
+    .proof-row { display: grid; grid-template-columns: 150px 1fr 72px; gap: 16px; align-items: center; margin: 22px 0; }
+    .proof-row span { font-size: .85rem; }
+    .proof-track { height: 22px; background: color-mix(in srgb, var(--panel) 10%, transparent); position: relative; }
+    .proof-zero { position: absolute; width: 1px; height: 34px; top: -6px; left: 30%; background: color-mix(in srgb, var(--panel) 45%, transparent); }
+    .proof-bar { height: 100%; position: absolute; left: 30%; }
+    .proof-bar.positive { background: var(--accent-bright); }
+    .proof-bar.negative { right: 70%; left: auto; background: var(--orange); }
+    .proof-value { font-family: "Barlow Condensed", sans-serif; font-size: 1.6rem; font-weight: 700; text-align: right; }
+    .proof-copy { border-left: 1px solid color-mix(in srgb, var(--panel) 30%, transparent); padding-left: 28px; }
+    .proof-copy strong { display: block; font-family: "Barlow Condensed", sans-serif; color: var(--accent-bright); font-size: clamp(3.8rem, 7vw, 7rem); line-height: .8; }
+    .proof-copy p { color: color-mix(in srgb, var(--panel) 72%, transparent); margin: 16px 0 0; }
+    .method-note { font-size: .75rem; color: color-mix(in srgb, var(--panel) 55%, transparent); margin-top: 30px; max-width: 780px; }
+    .method-note a { color: var(--accent-bright); }
+    .drawer-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .45); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20; }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; right: 0; top: 0; height: 100dvh; width: min(520px, 100%); background: var(--panel); color: var(--ink); z-index: 21; box-shadow: -24px 0 70px rgba(0, 0, 0, .25); overflow-y: auto; padding: 22px clamp(20px, 5vw, 40px) 40px; display: none;
+    }
+    .drawer.open { display: block; }
+    .drawer-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    .drawer-top span { color: var(--muted); font-size: .8rem; font-weight: 600; }
+    .close { width: 42px; height: 42px; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); font-size: 1.4rem; cursor: pointer; }
+    .drawer-id { display: flex; justify-content: space-between; gap: 20px; align-items: start; margin: 30px 0; }
+    .drawer-name { font-family: "Barlow Condensed", sans-serif; font-size: clamp(3rem, 9vw, 5rem); line-height: .85; letter-spacing: -.035em; font-weight: 800; text-transform: uppercase; }
+    .drawer-sub { color: var(--muted); margin-top: 8px; }
+    .drawer-score { text-align: right; }
+    .drawer-score strong { font-family: "Barlow Condensed", sans-serif; font-size: 3.4rem; line-height: .8; display: block; }
+    .drawer-score span { font-size: .7rem; color: var(--muted); font-weight: 600; }
+    .callout { background: var(--panel-2); border-top: 4px solid var(--accent); padding: 18px; color: var(--muted); }
+    .callout strong { color: var(--ink); }
+    .chart-box { margin-top: 30px; }
+    .chart-box h3 { text-transform: uppercase; margin: 0 0 14px; font-size: 1.35rem; }
+    .chart-legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: .72rem; margin-bottom: 12px; }
+    .legend-dot { display: inline-block; width: 9px; height: 9px; margin-right: 6px; border-radius: 50%; }
+    .chart { width: 100%; height: auto; display: block; overflow: visible; }
+    .chart .grid { stroke: var(--line); stroke-width: 1; }
+    .chart .snap { stroke: var(--accent); stroke-width: 3; fill: none; }
+    .chart .ppr { stroke: var(--orange); stroke-width: 3; fill: none; }
+    .chart circle.snap-point { fill: var(--accent); }
+    .chart circle.ppr-point { fill: var(--orange); }
+    .chart text { fill: var(--muted); font: 11px "IBM Plex Sans", sans-serif; }
+    .drawer-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 28px; }
+    .drawer-stats .stat { padding: 16px 8px; }
+    .drawer-stats .stat + .stat { border-left: 1px solid var(--line); }
+    .stat span { display: block; color: var(--muted); font-size: .68rem; }
+    .stat strong { font-size: 1.8rem; }
+    .toast { position: fixed; left: 50%; bottom: max(22px, env(safe-area-inset-bottom)); transform: translate(-50%, 20px); background: var(--ink); color: var(--panel); padding: 11px 16px; z-index: 30; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; font-size: .84rem; box-shadow: var(--shadow); }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .footer { padding: 18px clamp(20px, 5vw, 72px) 28px; background: var(--panel); color: var(--muted); font-size: .72rem; display: flex; justify-content: space-between; gap: 18px; border-top: 1px solid var(--line); }
+    .footer a { color: var(--ink); }
+    @media (max-width: 900px) {
+      .top { grid-template-columns: 1fr; align-items: start; }
+      .top-actions { justify-content: flex-start; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .featured { border-right: 0; border-bottom: 1px solid var(--line-strong); }
+      .board-head { grid-template-columns: 1fr; align-items: start; }
+      .filters { justify-content: flex-start; }
+      .player-row { grid-template-columns: 44px minmax(160px, 1fr) minmax(150px, .8fr) 52px 20px; }
+      .player-row .reason { display: none; }
+      .proof-grid { grid-template-columns: 1fr; }
+      .proof-copy { border-left: 0; border-top: 1px solid color-mix(in srgb, var(--panel) 30%, transparent); padding: 28px 0 0; }
+    }
+    @media (max-width: 620px) {
+      body { background-size: 36px 36px; }
+      .top { padding-top: 26px; }
+      h1 { font-size: clamp(3rem, 16vw, 5rem); }
+      .top-actions { width: 100%; }
+      .top-actions .btn { flex: 1; }
+      .feature-main { grid-template-columns: 1fr; }
+      .signal-score { display: flex; gap: 8px; align-items: baseline; text-align: left; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric:last-child { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+      .queue li { grid-template-columns: 24px 1fr auto; }
+      .filters { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+      .filter { padding: 8px; }
+      .player-row, .player-row.priority-row { grid-template-columns: 38px 1fr auto 18px; gap: 10px; padding: 15px 0; box-shadow: none; }
+      .player-row.priority-row { border-left: 4px solid var(--accent); padding-left: 9px; }
+      .row-rank { text-align: left; }
+      .row-person .team-mark { display: none; }
+      .player-row .trend, .player-row .reason { display: none; }
+      .row-name { font-size: .94rem; }
+      .row-score { font-size: 1.5rem; }
+      .proof-row { grid-template-columns: 94px 1fr 50px; gap: 10px; }
+      .footer { flex-direction: column; }
+      .drawer { padding-bottom: max(40px, env(safe-area-inset-bottom)); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div>
+        <div class="season">
+          <span><i class="live-dot"></i>2026 season</span>
+          <span>Through Week 3</span>
+          <span>PPR scoring</span>
+        </div>
+        <h1>Week 4 <em>pickups</em></h1>
+      </div>
+      <div class="top-actions">
+        <button class="btn" id="jumpBoard">Full board</button>
+        <button class="btn primary" id="copyShortlist" aria-label="Copy priority shortlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="1"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+          Copy shortlist
+        </button>
+      </div>
+    </header>
+
+    <section class="summary-grid" aria-label="Top waiver signal">
+      <article class="featured" id="featured"></article>
+      <aside class="watch">
+        <div class="section-label"><b>Priority claim order</b><span>Top four</span></div>
+        <h2>Usage up. Points pending.</h2>
+        <ol class="queue" id="queue"></ol>
+      </aside>
+    </section>
+
+    <section class="board" id="board">
+      <div class="board-head">
+        <div>
+          <h2>Signal board</h2>
+          <p>Rising opportunity, ranked by snap share, targets and touches. Priority marks the players whose fantasy points still lag the workload.</p>
+        </div>
+        <div class="filters" role="group" aria-label="Filter signal board">
+          <button class="filter active" data-filter="all">All</button>
+          <button class="filter" data-filter="priority">Priority</button>
+          <button class="filter" data-filter="RB">RB</button>
+          <button class="filter" data-filter="WR">WR</button>
+          <button class="filter" data-filter="TE">TE</button>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="search" type="search" placeholder="Search player or team" aria-label="Search player or team">
+      </div>
+      <div class="board-list" id="boardList" aria-live="polite"></div>
+    </section>
+
+    <section class="validation" id="validation">
+      <h2>Why chase usage?</h2>
+      <p class="validation-intro">A single historical checkpoint: Week 4 of 2025 was scored using only Weeks 1–4, then measured over Weeks 5–8.</p>
+      <div class="proof-grid">
+        <div class="proof-chart" aria-label="Average PPR points per week change by signal type">
+          <div class="proof-row">
+            <span>Priority signal</span>
+            <div class="proof-track"><i class="proof-zero"></i><i class="proof-bar positive" style="width:55%"></i></div>
+            <strong class="proof-value">+2.2</strong>
+          </div>
+          <div class="proof-row">
+            <span>All players</span>
+            <div class="proof-track"><i class="proof-zero"></i><i class="proof-bar positive" style="width:15%"></i></div>
+            <strong class="proof-value">+0.6</strong>
+          </div>
+          <div class="proof-row">
+            <span>Already scoring</span>
+            <div class="proof-track"><i class="proof-zero"></i><i class="proof-bar negative" style="width:20%"></i></div>
+            <strong class="proof-value">−0.8</strong>
+          </div>
+        </div>
+        <div class="proof-copy">
+          <strong>3.7×</strong>
+          <p>The priority group's improvement over baseline. Useful evidence, not a guarantee: this is one season and one checkpoint.</p>
+        </div>
+      </div>
+      <p class="method-note">Breakout scores run from 0–100 and reward rising snaps, targets and touches. They do not account for league availability yet; verify each player before placing a claim. <a href="https://github.com/seampm/waiverwire" target="_blank" rel="noopener noreferrer">Read the methodology and code</a>.</p>
+    </section>
+
+    <footer class="footer">
+      <span>Snapshot: 2026 season through Week 3</span>
+      <span>Built from nflverse play-by-play and snap-count data</span>
+    </footer>
+  </main>
+
+  <div class="drawer-backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerName">
+    <div class="drawer-top"><span>PLAYER SIGNAL</span><button class="close" id="closeDrawer" aria-label="Close player details">×</button></div>
+    <div id="drawerContent"></div>
+  </aside>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const DATA = {"season":2026,"week":3,"pickup_week":4,"players":[{"name":"T.Higbee","position":"TE","team":"LA","score":92.9,"priority":false,"reason":"targets 2.0 to 11.0/wk; snaps 20% to 71%","weeks":[1,3],"targets":[2.0,11.0],"touches":[2.0,11.0],"snap_share":[0.2,0.71],"ppr":[3.2,20.2]},{"name":"E.Wilson","position":"RB","team":"SEA","score":82.7,"priority":true,"reason":"touches 2.0 to 15.5/wk; snaps 6% to 38%; points have not caught up yet","weeks":[1,2,3],"targets":[0.0,1.0,0.0],"touches":[2.0,22.0,9.0],"snap_share":[0.06,0.41,0.36],"ppr":[0.3,9.2,1.4]},{"name":"A.Jones","position":"RB","team":"MIN","score":79.7,"priority":false,"reason":"targets 1.0 to 3.0/wk; snaps 46% to 80%","weeks":[1,2,3],"targets":[1.0,0.0,6.0],"touches":[13.0,23.0,23.0],"snap_share":[0.46,0.81,0.8],"ppr":[10.0,10.5,14.2]},{"name":"K.Mumpfield","position":"WR","team":"LA","score":76.6,"priority":false,"reason":"targets 1.0 to 5.0/wk; snaps 26% to 71%","weeks":[1,2,3],"targets":[1.0,2.0,8.0],"touches":[1.0,2.0,8.0],"snap_share":[0.26,0.69,0.73],"ppr":[0.0,2.2,19.3]},{"name":"S.Moore","position":"WR","team":"GB","score":74.0,"priority":true,"reason":"targets 1.0 to 5.0/wk; snaps 6% to 44%; points have not caught up yet","weeks":[1,2,3],"targets":[1.0,3.0,7.0],"touches":[1.0,3.0,7.0],"snap_share":[0.06,0.36,0.52],"ppr":[0.0,2.6,6.1]},{"name":"D.Adams","position":"WR","team":"LA","score":71.7,"priority":false,"reason":"targets 6.0 to 11.5/wk; snaps 54% to 74%","weeks":[1,2,3],"targets":[6.0,10.0,13.0],"touches":[6.0,10.0,13.0],"snap_share":[0.54,0.65,0.83],"ppr":[5.6,39.5,20.7]},{"name":"J.Wayne","position":"WR","team":"HOU","score":70.2,"priority":true,"reason":"targets 1.0 to 5.5/wk; snaps 32% to 55%; points have not caught up yet","weeks":[1,2,3],"targets":[1.0,7.0,4.0],"touches":[1.0,7.0,4.0],"snap_share":[0.32,0.5,0.61],"ppr":[2.2,5.3,3.0]},{"name":"R.Bateman","position":"WR","team":"BAL","score":67.6,"priority":false,"reason":"targets 1.0 to 6.0/wk; snaps 78% to 90%","weeks":[1,2,3],"targets":[1.0,9.0,3.0],"touches":[1.0,9.0,3.0],"snap_share":[0.78,0.93,0.88],"ppr":[0.0,21.8,5.7]},{"name":"I.Williams","position":"WR","team":"NYJ","score":67.5,"priority":false,"reason":"targets 1.0 to 4.0/wk; snaps 60% to 86%","weeks":[1,2,3],"targets":[1.0,6.0,2.0],"touches":[1.0,7.0,2.0],"snap_share":[0.6,0.82,0.89],"ppr":[1.7,10.8,3.1]},{"name":"J.Chase","position":"WR","team":"CIN","score":67.3,"priority":false,"reason":"targets 4.0 to 10.5/wk","weeks":[1,2,3],"targets":[4.0,9.0,12.0],"touches":[4.0,9.0,12.0],"snap_share":[0.94,0.88,1.0],"ppr":[3.2,26.5,24.8]},{"name":"L.Treadwell","position":"WR","team":"IND","score":66.8,"priority":false,"reason":"targets 1.0 to 2.0/wk; snaps 35% to 76%","weeks":[1,2,3],"targets":[1.0,3.0,1.0],"touches":[1.0,3.0,1.0],"snap_share":[0.35,0.74,0.79],"ppr":[0.0,9.1,3.0]},{"name":"J.Addison","position":"WR","team":"MIN","score":66.7,"priority":false,"reason":"targets 2.0 to 7.0/wk","weeks":[1,2,3],"targets":[2.0,5.0,9.0],"touches":[2.0,5.0,9.0],"snap_share":[0.83,0.88,0.98],"ppr":[0.0,4.1,20.0]},{"name":"K.Coleman","position":"WR","team":"MIA","score":66.6,"priority":true,"reason":"targets 2.0 to 4.0/wk; snaps 29% to 62%; points have not caught up yet","weeks":[1,3],"targets":[2.0,4.0],"touches":[2.0,4.0],"snap_share":[0.29,0.62],"ppr":[0.0,1.3]},{"name":"Mi.Wilson","position":"WR","team":"ARI","score":66.2,"priority":false,"reason":"targets 7.0 to 12.0/wk","weeks":[1,2,3],"targets":[7.0,7.0,17.0],"touches":[7.0,7.0,17.0],"snap_share":[0.85,0.94,0.93],"ppr":[10.6,3.8,25.9]},{"name":"J.Warren","position":"RB","team":"PIT","score":65.4,"priority":false,"reason":"touches 16.0 to 18.0/wk; snaps 37% to 80%","weeks":[1,2,3],"targets":[6.0,4.0,4.0],"touches":[16.0,15.0,21.0],"snap_share":[0.37,0.71,0.9],"ppr":[12.3,9.7,20.6]},{"name":"G.Wilson","position":"WR","team":"NYJ","score":64.6,"priority":false,"reason":"targets 7.0 to 10.5/wk; snaps 75% to 91%","weeks":[1,2,3],"targets":[7.0,7.0,14.0],"touches":[7.0,7.0,14.0],"snap_share":[0.75,0.88,0.94],"ppr":[13.9,16.7,26.7]},{"name":"T.Pollard","position":"RB","team":"TEN","score":64.5,"priority":false,"reason":"touches 9.0 to 18.0/wk","weeks":[1,2,3],"targets":[2.0,1.0,4.0],"touches":[9.0,15.0,21.0],"snap_share":[0.52,0.55,0.53],"ppr":[4.4,7.5,13.6]},{"name":"J.Waddle","position":"WR","team":"DEN","score":63.8,"priority":false,"reason":"targets 3.0 to 9.0/wk","weeks":[1,2,3],"targets":[3.0,10.0,8.0],"touches":[3.0,10.0,9.0],"snap_share":[0.75,0.61,0.73],"ppr":[1.2,21.8,4.4]},{"name":"D.Waller","position":"TE","team":"CAR","score":63.4,"priority":false,"reason":"targets 2.0 to 5.5/wk; snaps 35% to 48%","weeks":[1,2,3],"targets":[2.0,3.0,8.0],"touches":[2.0,3.0,8.0],"snap_share":[0.35,0.44,0.51],"ppr":[4.8,18.3,10.1]},{"name":"J.Jennings","position":"WR","team":"MIN","score":63.4,"priority":true,"reason":"targets 1.0 to 2.0/wk; snaps 48% to 80%; points have not caught up yet","weeks":[1,3],"targets":[1.0,2.0],"touches":[1.0,2.0],"snap_share":[0.48,0.8],"ppr":[0.0,1.1]},{"name":"P.Washington","position":"WR","team":"JAX","score":63.3,"priority":false,"reason":"targets 6.0 to 8.5/wk; snaps 61% to 81%","weeks":[1,2,3],"targets":[6.0,12.0,5.0],"touches":[6.0,12.0,5.0],"snap_share":[0.61,0.81,0.81],"ppr":[19.3,16.8,13.0]},{"name":"H.Fannin","position":"TE","team":"CLE","score":63.1,"priority":false,"reason":"targets 3.0 to 7.5/wk","weeks":[1,2,3],"targets":[3.0,6.0,9.0],"touches":[3.0,6.0,9.0],"snap_share":[0.82,0.86,0.86],"ppr":[4.1,10.4,24.1]},{"name":"R.Rice","position":"WR","team":"KC","score":62.7,"priority":false,"reason":"targets 2.0 to 7.5/wk","weeks":[1,2,3],"targets":[2.0,6.0,9.0],"touches":[2.0,6.0,9.0],"snap_share":[0.83,0.79,0.77],"ppr":[9.9,12.3,15.8]},{"name":"O.Hampton","position":"RB","team":"LAC","score":62.2,"priority":false,"reason":"targets 0.0 to 1.5/wk","weeks":[1,2,3],"targets":[0.0,2.0,1.0],"touches":[12.0,25.0,16.0],"snap_share":[0.58,0.63,0.42],"ppr":[10.3,19.5,5.6]},{"name":"K.Boutte","position":"WR","team":"HOU","score":62.1,"priority":false,"reason":"targets 2.0 to 3.5/wk; snaps 46% to 70%","weeks":[1,2,3],"targets":[2.0,5.0,2.0],"touches":[2.0,5.0,2.0],"snap_share":[0.46,0.72,0.69],"ppr":[3.1,6.7,4.1]},{"name":"O.Gadsden","position":"TE","team":"LAC","score":62.1,"priority":false,"reason":"snaps 18% to 50%","weeks":[1,2,3],"targets":[2.0,2.0,3.0],"touches":[2.0,2.0,3.0],"snap_share":[0.18,0.44,0.57],"ppr":[5.2,9.8,0.0]},{"name":"J.Meyers","position":"WR","team":"JAX","score":61.9,"priority":false,"reason":"targets 2.0 to 4.5/wk; snaps 65% to 86%","weeks":[1,2,3],"targets":[2.0,1.0,8.0],"touches":[3.0,1.0,8.0],"snap_share":[0.65,0.9,0.81],"ppr":[12.2,3.8,19.4]},{"name":"J.Downs","position":"WR","team":"IND","score":61.0,"priority":false,"reason":"targets 4.0 to 10.0/wk","weeks":[1,2,3],"targets":[4.0,9.0,11.0],"touches":[4.0,9.0,11.0],"snap_share":[0.89,0.83,0.68],"ppr":[5.7,14.2,12.7]},{"name":"D.Meyers","position":"WR","team":"CIN","score":60.6,"priority":true,"reason":"targets 1.0 to 3.0/wk; snaps 16% to 37%; points have not caught up yet","weeks":[1,2,3],"targets":[1.0,1.0,5.0],"touches":[2.0,1.0,5.0],"snap_share":[0.16,0.18,0.56],"ppr":[3.8,0.0,5.9]},{"name":"J.Dobbins","position":"RB","team":"DEN","score":59.9,"priority":true,"reason":"targets 0.0 to 1.0/wk; points have not caught up yet","weeks":[1,2,3],"targets":[0.0,0.0,2.0],"touches":[8.0,10.0,19.0],"snap_share":[0.43,0.34,0.49],"ppr":[3.6,3.6,6.3]}],"backtest":{"priority":{"avg_delta":2.22,"players":[{"name":"P.Washington","pre":6.6,"post":8.2,"delta":1.6},{"name":"E.Wilson","pre":4.7,"post":5.3,"delta":0.6},{"name":"G.Dortch","pre":3.4,"post":5.2,"delta":1.8},{"name":"C.Moore","pre":3.3,"post":7.2,"delta":3.9},{"name":"I.Bond","pre":4.1,"post":2.6,"delta":-1.5},{"name":"B.Corum","pre":5.5,"post":3.0,"delta":-2.5},{"name":"E.Engram","pre":4.7,"post":10.0,"delta":5.3},{"name":"K.Bourne","pre":5.6,"post":13.6,"delta":8.0},{"name":"O.Gordon","pre":3.6,"post":4.2,"delta":0.6},{"name":"I.Davis","pre":2.7,"post":7.1,"delta":4.4}]},"trending":{"avg_delta":-0.76,"players":[{"name":"X.Worthy","pre":8.6,"post":9.9,"delta":1.4},{"name":"C.Skattebo","pre":13.0,"post":18.9,"delta":6.0},{"name":"W.Marks","pre":9.7,"post":10.0,"delta":0.3},{"name":"Q.Judkins","pre":16.0,"post":12.1,"delta":-3.9},{"name":"O.Hampton","pre":16.0,"post":13.0,"delta":-3.0},{"name":"P.Nacua","pre":27.4,"post":14.7,"delta":-12.7},{"name":"J.Tolbert","pre":5.0,"post":4.3,"delta":-0.8},{"name":"D.Washington","pre":2.5,"post":9.2,"delta":6.7},{"name":"C.McCaffrey","pre":23.5,"post":25.2,"delta":1.7},{"name":"T.Tremble","pre":6.2,"post":3.0,"delta":-3.2}]},"baseline_avg_delta":0.59}};
+    const players = DATA.players;
+    let activeFilter = 'all';
+    let query = '';
+    const featured = players.find(p => p.priority) || players[0];
+
+    function esc(value) {
+      return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+    function latest(arr) { return arr[arr.length - 1]; }
+    function first(arr) { return arr[0]; }
+    function recentAvg(arr) {
+      const recent = arr.slice(-2);
+      return recent.reduce((sum, value) => sum + value, 0) / recent.length;
+    }
+    function delta(from, to, suffix) {
+      const d = to - from;
+      return `${d >= 0 ? '+' : ''}${d.toFixed(d % 1 ? 1 : 0)}${suffix || ''}`;
+    }
+    function renderFeatured() {
+      const p = featured;
+      featuredEl = document.getElementById('featured');
+      featuredEl.innerHTML = `
+        <div class="section-label"><b>Top unconverted signal</b><span>Tap a player below for weekly detail</span></div>
+        <div class="feature-main">
+          <div class="player-line"><span class="team-mark">${esc(p.team)}</span><div><div class="feature-name">${esc(p.name)}</div><div class="identity">${esc(p.position)} · ${esc(p.team)} · Priority pickup</div></div></div>
+          <div class="signal-score"><div class="score">${p.score.toFixed(1)}</div><div class="score-denom">BREAKOUT / 100</div></div>
+        </div>
+        <p class="thesis"><strong>The workload arrived before the points.</strong> ${esc(p.reason.replace('; points have not caught up yet',''))}. His weekly PPR output has not converted that opportunity yet.</p>
+        <div class="metrics">
+          <div class="metric"><span>TOUCHES · WK 1 → RECENT 2-WK AVG</span><strong>${first(p.touches).toFixed(1)} → ${recentAvg(p.touches).toFixed(1)}</strong><small>${delta(first(p.touches), recentAvg(p.touches))} touches</small></div>
+          <div class="metric"><span>SNAP SHARE · WK 1 → RECENT 2-WK AVG</span><strong>${Math.round(first(p.snap_share)*100)}% → ${Math.floor(recentAvg(p.snap_share)*100)}%</strong><small>${delta(first(p.snap_share)*100, Math.floor(recentAvg(p.snap_share)*100), ' pts')}</small></div>
+          <div class="metric"><span>LATEST PPR</span><strong>${latest(p.ppr).toFixed(1)}</strong><small>points still lagging</small></div>
+        </div>`;
+    }
+    function renderQueue() {
+      const priority = players.filter(p => p.priority).slice(0, 4);
+      document.getElementById('queue').innerHTML = priority.map((p, i) => `
+        <li><span class="rank">0${i+1}</span><span><span class="queue-name">${esc(p.name)}</span><span class="queue-meta">${esc(p.position)} · ${esc(p.team)} · ${esc(p.reason.split(';')[0])}</span></span><strong class="queue-score">${p.score.toFixed(1)}</strong></li>`).join('');
+    }
+    function renderBoard() {
+      const list = players.filter(p => {
+        const matchesFilter = activeFilter === 'all' || (activeFilter === 'priority' ? p.priority : p.position === activeFilter);
+        const q = query.toLowerCase();
+        const matchesQuery = !q || p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q);
+        return matchesFilter && matchesQuery;
+      });
+      const root = document.getElementById('boardList');
+      if (!list.length) {
+        root.innerHTML = '<div class="empty">No players match this view.</div>';
+        return;
+      }
+      root.innerHTML = list.map(p => {
+        const rank = players.indexOf(p) + 1;
+        const snapStart = Math.round(first(p.snap_share) * 100);
+        const snapEnd = Math.round(latest(p.snap_share) * 100);
+        return `<button class="player-row ${p.priority ? 'priority-row' : ''}" data-player="${esc(p.name)}" aria-label="View ${esc(p.name)} details">
+          <span class="row-rank">${String(rank).padStart(2,'0')}</span>
+          <span class="row-person"><span class="team-mark">${esc(p.team)}</span><span><span class="row-name">${esc(p.name)}</span><span class="row-meta">${esc(p.position)} · ${esc(p.team)}</span></span></span>
+          <span class="reason">${esc(p.reason)}</span>
+          <span class="trend"><span class="trend-label"><span>SNAP SHARE</span><b>${snapStart}% → ${snapEnd}%</b></span><span class="trend-track"><i class="trend-fill" style="width:${Math.max(4, snapEnd)}%"></i></span></span>
+          <span><span class="tag ${p.priority ? 'priority' : ''}">${p.priority ? 'PRIORITY' : 'TRENDING'}</span><span class="row-score">${p.score.toFixed(1)}</span></span>
+          <span class="chev">›</span>
+        </button>`;
+      }).join('');
+      root.querySelectorAll('.player-row').forEach(btn => btn.addEventListener('click', () => openDrawer(btn.dataset.player)));
+    }
+    function chartSvg(p) {
+      const w = 430, h = 210, left = 34, right = 12, top = 14, bottom = 30;
+      const n = p.weeks.length;
+      const xs = p.weeks.map((_, i) => left + (n === 1 ? 0 : i * (w-left-right)/(n-1)));
+      const snapY = p.snap_share.map(v => top + (1-v)*(h-top-bottom));
+      const pprMax = Math.max(24, ...p.ppr);
+      const pprY = p.ppr.map(v => top + (1-v/pprMax)*(h-top-bottom));
+      const path = ys => ys.map((y,i) => `${i?'L':'M'} ${xs[i].toFixed(1)} ${y.toFixed(1)}`).join(' ');
+      return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Weekly snap share and PPR points for ${esc(p.name)}">
+        ${[0,.5,1].map(v => `<line class="grid" x1="${left}" x2="${w-right}" y1="${top+v*(h-top-bottom)}" y2="${top+v*(h-top-bottom)}"/>`).join('')}
+        <path class="snap" d="${path(snapY)}"/><path class="ppr" d="${path(pprY)}"/>
+        ${snapY.map((y,i)=>`<circle class="snap-point" cx="${xs[i]}" cy="${y}" r="4"/>`).join('')}
+        ${pprY.map((y,i)=>`<circle class="ppr-point" cx="${xs[i]}" cy="${y}" r="4"/>`).join('')}
+        ${p.weeks.map((wk,i)=>`<text x="${xs[i]}" y="${h-8}" text-anchor="middle">WK ${wk}</text>`).join('')}
+      </svg>`;
+    }
+    function openDrawer(name) {
+      const p = players.find(x => x.name === name);
+      if (!p) return;
+      document.getElementById('drawerContent').innerHTML = `
+        <div class="drawer-id">
+          <div><div class="drawer-name" id="drawerName">${esc(p.name)}</div><div class="drawer-sub">${esc(p.position)} · ${esc(p.team)} · ${p.priority ? 'Priority pickup' : 'Trending signal'}</div></div>
+          <div class="drawer-score"><strong>${p.score.toFixed(1)}</strong><span>BREAKOUT / 100</span></div>
+        </div>
+        <div class="callout"><strong>${p.priority ? 'Points are lagging the workload.' : 'Usage is rising and production has started.'}</strong><br>${esc(p.reason)}</div>
+        <div class="chart-box"><h3>Weekly signal</h3><div class="chart-legend"><span><i class="legend-dot" style="background:var(--accent)"></i>Snap share (scaled 0–100%)</span><span><i class="legend-dot" style="background:var(--orange)"></i>PPR points (scaled to chart)</span></div>${chartSvg(p)}</div>
+        <div class="drawer-stats">
+          <div class="stat"><span>LATEST TARGETS</span><strong>${latest(p.targets).toFixed(1)}</strong></div>
+          <div class="stat"><span>LATEST TOUCHES</span><strong>${latest(p.touches).toFixed(1)}</strong></div>
+          <div class="stat"><span>LATEST SNAPS</span><strong>${Math.round(latest(p.snap_share)*100)}%</strong></div>
+        </div>`;
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('backdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('closeDrawer').focus();
+    }
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('backdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+    async function copyShortlist() {
+      const text = `Week ${DATA.pickup_week} waiver priority\n` + players.filter(p=>p.priority).slice(0,4).map((p,i)=>`${i+1}. ${p.name} (${p.position}, ${p.team}) — ${p.reason}`).join('\n');
+      try { await navigator.clipboard.writeText(text); showToast('Priority shortlist copied'); }
+      catch (err) { showToast('Copy unavailable in this browser'); }
+    }
+    document.querySelectorAll('.filter').forEach(btn => btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.filter;
+      document.querySelectorAll('.filter').forEach(b => b.classList.toggle('active', b === btn));
+      renderBoard();
+    }));
+    document.getElementById('search').addEventListener('input', e => { query = e.target.value.trim(); renderBoard(); });
+    document.getElementById('copyShortlist').addEventListener('click', copyShortlist);
+    document.getElementById('jumpBoard').addEventListener('click', () => document.getElementById('board').scrollIntoView({behavior:'smooth'}));
+    document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+    document.getElementById('backdrop').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+    renderFeatured();
+    renderQueue();
+    renderBoard();
+  </script>
+</body>
+</html>

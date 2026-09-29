@@ -354,6 +354,24 @@
       </div>
     </header>
 
+    <section class="matchup" id="matchup" aria-label="Team matchup comparison">
+      <h2>Matchup</h2>
+      <p class="lede">Line up your roster against your opponent's, head to head. Form is each player's average PPR per game this season. Yahoo sync is still waiting on their approval, so rosters are entered by hand for now. Kickers and defenses are not tracked.</p>
+      <div class="mu-grid">
+        <div class="mu-side">
+          <label for="rosterA">Your team</label>
+          <textarea id="rosterA" placeholder="One player per line&#10;Ja'Marr Chase&#10;E.Wilson&#10;T.Higbee"></textarea>
+        </div>
+        <div class="mu-side">
+          <label for="rosterB">Opponent</label>
+          <textarea id="rosterB" placeholder="One player per line"></textarea>
+        </div>
+      </div>
+      <button class="btn primary" id="compareBtn">Compare teams</button>
+      <div id="matchupOut" aria-live="polite"></div>
+      <p class="mu-note">Form is descriptive, not a prediction. It says who has produced lately, not who will win. Matchups, injuries, and game script move these numbers a lot.</p>
+    </section>
+
     <section class="summary-grid" aria-label="Top waiver signal">
       <article class="featured" id="featured"></article>
       <aside class="watch">
@@ -390,24 +408,6 @@
         <input id="search" type="search" placeholder="Search player or team" aria-label="Search player or team">
       </div>
       <div class="board-list" id="boardList" aria-live="polite"></div>
-    </section>
-
-    <section class="matchup" id="matchup" aria-label="Team matchup comparison">
-      <h2>Matchup</h2>
-      <p class="lede">Line up your roster against your opponent's, head to head. Form is each player's average PPR per game this season. Yahoo sync is still waiting on their approval, so rosters are entered by hand for now. Kickers and defenses are not tracked.</p>
-      <div class="mu-grid">
-        <div class="mu-side">
-          <label for="rosterA">Your team</label>
-          <textarea id="rosterA" placeholder="One player per line&#10;Ja'Marr Chase&#10;E.Wilson&#10;T.Higbee"></textarea>
-        </div>
-        <div class="mu-side">
-          <label for="rosterB">Opponent</label>
-          <textarea id="rosterB" placeholder="One player per line"></textarea>
-        </div>
-      </div>
-      <button class="btn primary" id="compareBtn">Compare teams</button>
-      <div id="matchupOut" aria-live="polite"></div>
-      <p class="mu-note">Form is descriptive, not a prediction. It says who has produced lately, not who will win. Matchups, injuries, and game script move these numbers a lot.</p>
     </section>
 
     <section class="glossary" aria-label="Metric glossary">

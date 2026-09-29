@@ -1,0 +1,5 @@
+[
+  "tests/test_usage.py::test_flat_usage_has_zero_trend",
+  "tests/test_usage.py::test_rising_usage_has_positive_trend",
+  "tests/test_usage.py::test_target_share_sums_to_one"
+]
